@@ -1,0 +1,48 @@
+{
+  "name": "printvlc",
+  "version": "1.0.0",
+  "description": "The VLC Media Player of Printing — 100% Client-Side Universal Print Studio",
+  "author": "daiviaerooy",
+  "homepage": "https://github.com/daiviaerooy/PrintVLC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/daiviaerooy/PrintVLC.git"
+  },
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "build:single": "npm run build && node scripts/build-singlefile.mjs",
+    "lint": "oxlint",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@types/canvas-confetti": "^1.9.0",
+    "@types/prismjs": "^1.26.6",
+    "ag-psd": "^31.0.3",
+    "canvas-confetti": "^1.9.4",
+    "docx-preview": "^0.4.1",
+    "dxf-parser": "^1.1.2",
+    "idb": "^8.0.4",
+    "lucide-react": "^1.53.0",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^6.4.299",
+    "prismjs": "^1.30.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "utif": "^3.1.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "@vitejs/plugin-react": "^6.1.1",
+    "oxlint": "^1.81.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "~6.0.2",
+    "vite": "^8.3.0"
+  }
+}
