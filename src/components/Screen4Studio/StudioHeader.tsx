@@ -146,12 +146,12 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
 
       {/* RIGHT: Actions Suite (AI Assist, Master PDF, Pop-Out Print) */}
       <div className="flex items-center gap-2 shrink-0">
-        
+
         {/* AI Assist Modal Button */}
         <button
           type="button"
           onClick={onOpenAIModal}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-950/70 to-indigo-950/70 hover:from-cyan-900/80 hover:to-indigo-900/80 border border-cyan-500/40 text-[11px] text-[#00e5ff] font-semibold transition-all shadow-sm"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-950/70 to-indigo-950/70 hover:from-cyan-900/80 hover:to-indigo-900/80 border border-cyan-500/40 text-[11px] text-[#00e5ff] font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] shadow-sm"
           title="On-Device Privacy-Safe AI Assistant"
         >
           <Sparkles className="h-3.5 w-3.5 text-[#00e5ff]" />
@@ -163,7 +163,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
           type="button"
           onClick={onExportPdf}
           disabled={isExporting || totalPages === 0}
-          className="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#20202a] hover:bg-[#282836] border border-[#313144] text-[11px] text-gray-200 font-semibold transition-colors disabled:opacity-40"
+          className="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#20202a] hover:bg-[#282836] border border-[#313144] text-[11px] text-gray-200 font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-40"
           title="Export Print-Ready Flattened Master PDF"
         >
           <Download className="h-3.5 w-3.5 text-amber-400" />
@@ -175,7 +175,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
           type="button"
           onClick={onOpenPrintModal}
           disabled={isPrinting || totalPages === 0}
-          className="flex items-center gap-2 px-4 md:px-5 py-2 rounded-xl bg-gradient-to-r from-[#ff781f] to-[#ff9800] hover:from-[#ff8e3d] hover:to-[#ffa726] text-black text-xs font-bold font-mono uppercase tracking-wider transition-all shadow-lg shadow-[#ff781f]/25 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none"
+          className="flex items-center gap-2 px-4 md:px-5 py-2 rounded-xl bg-gradient-to-r from-[#ff781f] to-[#ff9800] hover:from-[#ff8e3d] hover:to-[#ffa726] text-black text-xs font-bold font-mono uppercase tracking-wider transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-[#ff781f]/25 disabled:opacity-40 disabled:pointer-events-none"
           title="Pop out in new window and print document"
         >
           <Printer className="h-4 w-4 stroke-[2.5]" />

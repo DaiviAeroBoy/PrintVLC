@@ -268,9 +268,11 @@ export class PrintQueueManager {
           <button
             onClick={() => handleLoadDemoSamples('mixed')}
             disabled={isLoading}
-            className="flex items-center gap-2.5 p-3 rounded-xl bg-[#1d1d25] border border-[#2e2e3d] hover:border-[#ff781f] text-left transition-all"
+            className="flex items-center gap-2.5 p-3.5 rounded-xl bg-[#1d1d25] border border-[#2e2e3d] hover:border-[#ff781f] hover:bg-[#22222d] hover:-translate-y-1 hover:shadow-xl hover:shadow-[#ff781f]/15 text-left transition-all duration-200 cursor-pointer"
           >
-            <Layers className="h-5 w-5 text-[#ff781f] shrink-0" />
+            <div className="p-2 rounded-lg bg-[#ff781f]/15 text-[#ff781f] shrink-0">
+              <Layers className="h-5 w-5" />
+            </div>
             <div>
               <div className="text-xs font-semibold text-white">Multi-Format Bundle</div>
               <div className="text-[10px] text-gray-400">Text + Financial Scan</div>
@@ -280,9 +282,11 @@ export class PrintQueueManager {
           <button
             onClick={() => handleLoadDemoSamples('zpl')}
             disabled={isLoading}
-            className="flex items-center gap-2.5 p-3 rounded-xl bg-[#1d1d25] border border-[#2e2e3d] hover:border-[#00e5ff] text-left transition-all"
+            className="flex items-center gap-2.5 p-3.5 rounded-xl bg-[#1d1d25] border border-[#2e2e3d] hover:border-[#00e5ff] hover:bg-[#22222d] hover:-translate-y-1 hover:shadow-xl hover:shadow-[#00e5ff]/15 text-left transition-all duration-200 cursor-pointer"
           >
-            <HardDrive className="h-5 w-5 text-[#00e5ff] shrink-0" />
+            <div className="p-2 rounded-lg bg-[#00e5ff]/15 text-[#00e5ff] shrink-0">
+              <HardDrive className="h-5 w-5" />
+            </div>
             <div>
               <div className="text-xs font-semibold text-white">Zebra ZPL Thermal</div>
               <div className="text-[10px] text-gray-400">4x6" Shipping Barcode</div>
@@ -292,9 +296,11 @@ export class PrintQueueManager {
           <button
             onClick={() => handleLoadDemoSamples('cad')}
             disabled={isLoading}
-            className="flex items-center gap-2.5 p-3 rounded-xl bg-[#1d1d25] border border-[#2e2e3d] hover:border-amber-400 text-left transition-all"
+            className="flex items-center gap-2.5 p-3.5 rounded-xl bg-[#1d1d25] border border-[#2e2e3d] hover:border-amber-400 hover:bg-[#22222d] hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-400/15 text-left transition-all duration-200 cursor-pointer"
           >
-            <Cpu className="h-5 w-5 text-amber-400 shrink-0" />
+            <div className="p-2 rounded-lg bg-amber-400/15 text-amber-400 shrink-0">
+              <Cpu className="h-5 w-5" />
+            </div>
             <div>
               <div className="text-xs font-semibold text-white">2D CAD Blueprint</div>
               <div className="text-[10px] text-gray-400">DXF Vectors & Entities</div>
@@ -304,9 +310,11 @@ export class PrintQueueManager {
           <button
             onClick={() => handleLoadDemoSamples('code')}
             disabled={isLoading}
-            className="flex items-center gap-2.5 p-3 rounded-xl bg-[#1d1d25] border border-[#2e2e3d] hover:border-indigo-400 text-left transition-all"
+            className="flex items-center gap-2.5 p-3.5 rounded-xl bg-[#1d1d25] border border-[#2e2e3d] hover:border-indigo-400 hover:bg-[#22222d] hover:-translate-y-1 hover:shadow-xl hover:shadow-indigo-400/15 text-left transition-all duration-200 cursor-pointer"
           >
-            <FileCode2 className="h-5 w-5 text-indigo-400 shrink-0" />
+            <div className="p-2 rounded-lg bg-indigo-400/15 text-indigo-400 shrink-0">
+              <FileCode2 className="h-5 w-5" />
+            </div>
             <div>
               <div className="text-xs font-semibold text-white">Code & Markdown</div>
               <div className="text-[10px] text-gray-400">Prism Syntax Highlighting</div>

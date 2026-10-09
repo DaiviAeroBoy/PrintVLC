@@ -1,4 +1,4 @@
-import { DetectedPIIItem, WebGPUStatus } from '../types/ai';
+import { AIModelTier, DetectedPIIItem, WebGPUStatus } from '../types/ai';
 
 /**
  * Detect WebGPU hardware acceleration status
