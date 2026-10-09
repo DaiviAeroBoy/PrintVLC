@@ -2,11 +2,11 @@
   "name": "printvlc",
   "version": "1.0.0",
   "description": "The VLC Media Player of Printing — 100% Client-Side Universal Print Studio",
-  "author": "daiviaerooy",
-  "homepage": "https://github.com/daiviaerooy/PrintVLC",
+  "author": "DaiviAeroBoy",
+  "homepage": "https://github.com/DaiviAeroBoy/PrintVLC",
   "repository": {
     "type": "git",
-    "url": "https://github.com/daiviaerooy/PrintVLC.git"
+    "url": "https://github.com/DaiviAeroBoy/PrintVLC.git"
   },
   "private": true,
   "type": "module",

@@ -1,93 +1,179 @@
 # PrintVLC — Hardware Connection & Driver Setup Guide
 
-PrintVLC is designed to print directly to hardware **without installing proprietary drivers or bloatware**. This guide covers configuring each connection type.
+Created and maintained by **[DaiviAeroBoy](https://github.com/DaiviAeroBoy)**.  
+Repository: **[DaiviAeroBoy/PrintVLC](https://github.com/DaiviAeroBoy/PrintVLC)**.
 
-> 💡 **Quick Note for Single-File Users:**
-> - If running the standalone [`PrintVLC.html`](../PrintVLC.html) directly via `file:///`, all canvas editing, imposition, paper formats, and the **System Print Spooler** work 100% offline.
-> - For raw physical **WebUSB** and **Web Bluetooth** endpoints, modern browsers require a secure origin (`http://localhost:3000` or HTTPS). Use [`START_PRINTVLC.bat`](../START_PRINTVLC.bat) to launch the app on localhost with complete WebUSB/Bluetooth permissions.
+PrintVLC is engineered to communicate directly with physical printing hardware **without requiring bulky manufacturer software or proprietary drivers**. This guide provides complete instructions for configuring every connection channel.
 
 ---
 
-## 1. Direct WebUSB Connection
+## 📑 Table of Contents
+1. [Prerequisites & Secure Origin Requirements](#1-prerequisites--secure-origin-requirements)
+2. [Direct WebUSB Connection](#2-direct-webusb-connection)
+3. [Web Bluetooth Serial Port Profile (SPP)](#3-web-bluetooth-serial-port-profile-spp)
+4. [Local Network Endpoints (Port 631 IPP & Port 9100 RAW)](#4-local-network-endpoints-port-631-ipp--port-9100-raw)
+5. [System Print Spooler (Universal Fallback)](#5-system-print-spooler-universal-fallback)
+6. [Integrated Missing Driver Resolver](#6-integrated-missing-driver-resolver)
+7. [Thermal Label & Receipt Hardware Calibration Tips](#7-thermal-label--receipt-hardware-calibration-tips)
+8. [Hardware Troubleshooting Matrix](#8-hardware-troubleshooting-matrix)
 
-WebUSB allows Chromium-based browsers (Google Chrome, Microsoft Edge, Opera, Brave) to communicate directly with physical USB ports.
+---
+
+## 1. Prerequisites & Secure Origin Requirements
+
+Modern browsers implement strict security boundaries for raw hardware APIs:
+
+| Feature | Single-File `file:///` Mode (`PrintVLC.html`) | Localhost Mode (`START_PRINTVLC.bat`) | HTTPS Web Origin |
+| :--- | :---: | :---: | :---: |
+| **All Studio Tabs & Imposition** | ✅ 100% Offline | ✅ 100% Offline | ✅ Full Support |
+| **System Print Spooler (`window.print`)** | ✅ Fully Functional | ✅ Fully Functional | ✅ Full Support |
+| **PDF/X Master Export** | ✅ Fully Functional | ✅ Fully Functional | ✅ Full Support |
+| **WebUSB Direct Hardware** | ⚠️ Restricted by Browser Security | ✅ **Enabled** (`http://localhost:3000`) | ✅ **Enabled** |
+| **Web Bluetooth Direct Hardware** | ⚠️ Restricted by Browser Security | ✅ **Enabled** (`http://localhost:3000`) | ✅ **Enabled** |
+
+> 💡 **Recommendation:** For direct WebUSB or Bluetooth streaming, run PrintVLC via [`START_PRINTVLC.bat`](../START_PRINTVLC.bat), which serves the application on `http://localhost:3000` (classified as a Secure Context by Chromium).
+
+---
+
+## 2. Direct WebUSB Connection
+
+The WebUSB API (`navigator.usb`) allows Chromium-based browsers (Google Chrome, Microsoft Edge, Opera, Brave) to communicate directly with USB hardware endpoints without passing through the operating system's spooler.
+
+### Supported Hardware:
+- **Zebra Thermal Label Printers:** ZD410, ZD420, GX420d, GK420t, ZT230, etc.
+- **EPSON POS Receipt Printers:** TM-T88 series, TM-T20, TM-m30.
+- **Dymo LabelWriter Series:** 450, 4XL, 550.
+- **Standard Desktop USB Printers:** Utilizing USB Device Class `0x07` (Printer Class).
+
+### Vendor ID Registry in PrintVLC:
+```typescript
+filters: [
+  { classCode: 7 },     // Standard USB Printer Class
+  { vendorId: 0x04b8 }, // Epson
+  { vendorId: 0x03f0 }, // HP
+  { vendorId: 0x04a9 }, // Canon
+  { vendorId: 0x04f9 }, // Brother
+  { vendorId: 0x0a5f }, // Zebra
+  { vendorId: 0x0922 }, // Dymo
+]
+```
+
+### Step-by-Step Connection:
+1. Connect your printer to your workstation via USB cable and power it on.
+2. Open PrintVLC and click **Hardware Hub** (Screen 2) in the navigation bar.
+3. In the **Direct USB Port** card, click **`[ Scan USB Devices ]`**.
+4. The browser displays a hardware authorization prompt listing detected USB devices.
+5. Select your printer and click **Connect**.
+6. PrintVLC claims interface `0`, initializes the endpoint, and streams raw commands (ZPL, ESC/POS, or binary raster buffers) directly.
+
+### Windows Note (WinUSB Binding):
+On Windows, if the operating system binds a proprietary vendor driver to the USB device, the browser may report `Access Denied`. If this happens:
+- You can either use PrintVLC's **System Spooler mode** (which prints through the Windows driver with all PrintVLC prepress optimizations applied), or
+- Use the open-source utility **Zadig** to associate the device interface with the generic `WinUSB` driver.
+
+---
+
+## 3. Web Bluetooth Serial Port Profile (SPP)
+
+Web Bluetooth enables cable-free printing to portable receipt and label printers commonly used in mobile retail, field logistics, and warehouse environments.
 
 ### Supported Devices:
-- Zebra ZPL and EPL thermal label printers (ZD410, ZD420, GX420d, etc.)
-- EPSON TM-T88 and TM-series POS receipt printers
-- Dymo LabelWriter series
-- Standard USB desktop and laser printers
+- 58mm & 80mm mobile Bluetooth thermal receipt printers (ESC/POS compatible).
+- Portable warehouse barcode printers.
+- Bluetooth SPP hardware endpoints.
 
-### How to Connect:
-1. Plug your printer into your computer via USB.
-2. In PrintVLC, navigate to **Hardware Connection Hub** (Screen 2).
-3. Under the **Direct USB Port** card, click `[ Scan USB Devices ]`.
-4. Your browser will present a security permission prompt listing detected USB devices.
-5. Select your printer from the list and click **Connect**.
-6. PrintVLC will claim the USB interface (`classCode: 7` Printer class) and stream binary output directly to the device.
+### Supported Service UUIDs:
+- `000018f0-0000-1000-8000-00805f9b34fb` (Standard Printer Service)
+- `e7810a71-73ae-499d-8c15-faa9aef0c3f2` (Common Serial Port Profile)
 
----
-
-## 2. Web Bluetooth SPP (Serial Port Profile)
-
-Web Bluetooth enables wireless printing to portable belt-clip printers and mobile POS units.
-
-### Supported Devices:
-- Portable 58mm / 80mm Bluetooth receipt printers
-- Mobile warehouse barcode label printers
-- Bluetooth SPP hardware endpoints
-
-### How to Connect:
-1. Turn on your Bluetooth printer and ensure it is in pairing mode.
-2. Click `[ Pair Bluetooth Printer ]` on Connection Card 3.
-3. Select your printer from the browser's Bluetooth discovery dialog.
-4. PrintVLC pairs with the GATT server and streams raw ESC/POS or text byte streams.
+### Step-by-Step Connection:
+1. Turn on the Bluetooth printer and confirm Bluetooth pairing mode is active.
+2. Ensure your computer or mobile device has Bluetooth turned on.
+3. In PrintVLC Screen 2, locate the **Web Bluetooth** card and click **`[ Pair Bluetooth Printer ]`**.
+4. Choose your printer from the browser's pairing dialog and click **Pair**.
+5. PrintVLC connects to the GATT server and opens the primary data characteristic for raw streaming.
 
 ---
 
-## 3. Local Network / Wi-Fi (Port 631 IPP & Port 9100 RAW)
+## 4. Local Network Endpoints (Port 631 IPP & Port 9100 RAW)
 
-For network-connected office and enterprise printers, PrintVLC supports two standard protocols:
+For networked office multifunction printers and enterprise network label units, PrintVLC supports two standard local protocols:
 
 ### Protocol 1: IPP (Internet Printing Protocol — Port 631)
-- **URL Endpoint**: `http://<printer-ip>:631/ipp/print`
-- **Recommended for**: Modern network multi-function printers, HP ePrint, AirPrint-compatible devices.
+- **Endpoint URL:** `http://<printer-ip>:631/ipp/print`
+- **Recommended For:** Modern office printers, AirPrint-compatible devices, and HP/Canon/Epson network copiers.
+- **Payload:** High-DPI master PDF stream or binary IPP raster.
 
-### Protocol 2: AppSocket / Raw JetDirect (Port 9100)
-- **Port**: `9100`
-- **Recommended for**: Enterprise laser printers, network label printers, and barcode printers.
+### Protocol 2: Raw JetDirect / AppSocket (Port 9100)
+- **Port:** `9100`
+- **Recommended For:** Enterprise laser printers, industrial Zebra network heads, and high-speed line printers.
+- **Payload:** Raw PostScript, PCL, or ZPL byte stream.
 
-### Steps:
-1. Enter your printer's local IPv4 address (e.g., `192.168.1.150`).
-2. Toggle between **Port 631 (IPP)** and **Port 9100 (RAW)**.
-3. Click `[ Connect Network Printer ]` to run an instant handshake test.
-
----
-
-## 4. System Print Spooler (Universal Fallback)
-
-If your device is already connected to your operating system via Wi-Fi or USB, PrintVLC can route the processed canvas directly to the OS print spooler.
-
-### Benefits of PrintVLC's System Spooler Engine:
-- **Zero-Margin Printing**: Leverages PrintVLC's `@media print` CSS engine with `@page { margin: 0; }` to eliminate unwanted browser margins.
-- **High-DPI Quality**: High-resolution canvases (150–300 DPI) are streamed directly to the print stream.
-- **Pre-Processed Enhancements**: All deskewing, paper whitening, and pure K-channel black locks are pre-applied to the print stream.
+### Step-by-Step Connection:
+1. Identify your printer's local IPv4 address (e.g., `192.168.1.150`) via the printer display panel or router table.
+2. In PrintVLC Screen 2, select the **Local Network / Wi-Fi** card.
+3. Enter the IP address and choose your target port (**Port 631 IPP** or **Port 9100 RAW**).
+4. Click **`[ Connect Network Printer ]`** to perform an instant pre-flight ping.
 
 ---
 
-## 5. Missing Driver Resolver
+## 5. System Print Spooler (Universal Fallback)
 
-If your printer requires official OEM drivers, PrintVLC provides an integrated resolver:
+If your device is already paired to your operating system, PrintVLC's **System Spooler Engine** provides the ideal universal path.
 
-1. **Operating System Auto-Detection**: Automatically identifies if you are on Windows 11/10, macOS, or Linux.
-2. **Manufacturer Search Generator**: Select your brand (HP, Canon, Epson, Brother, Zebra, Pantum, Ricoh, Samsung, Dymo) and enter your model number to launch a direct verified Google search query:
+### Why PrintVLC's Spooler Beats Native Browser Printing:
+1. **Zero-Margin Layout:** Standard browser printing often injects unwanted headers, footers, and margins. PrintVLC injects calibrated CSS:
+   ```css
+   @page {
+     margin: 0;
+     size: auto;
+   }
+   ```
+2. **High-DPI Canvas Rendering:** Raw high-resolution canvases (150–300 DPI) are mounted directly to the print container, avoiding low-res screen rasterization.
+3. **Pre-Processed Ingestion:** All deskewing, paper background whitening, Pure K-channel black locks, and True Redactions are pre-rendered into the pixel stream before hitting the OS print queue.
+
+---
+
+## 6. Integrated Missing Driver Resolver
+
+If an unusual legacy printer requires official OEM manufacturer software, PrintVLC includes a built-in resolver:
+
+1. **OS Auto-Detection:** Detects whether your workstation runs Windows 11/10, macOS, or Linux.
+2. **Dynamic Search Query:** Select your manufacturer and enter your model to generate an official driver query:
    ```
    https://www.google.com/search?q={Brand}+{Model}+official+driver+download+{OS}
    ```
-3. **Official Repositories**:
-   - [OpenPrinting Database](https://www.openprinting.org/printers) — Linux/UNIX CUPS drivers.
+3. **Direct Verified Manufacturer Portals:**
+   - [OpenPrinting Database](https://www.openprinting.org/printers) — Linux/UNIX CUPS database.
    - [HP Support Hub](https://support.hp.com/us-en/drivers/printers) — LaserJet, DeskJet, OfficeJet.
-   - [Canon Global Support](https://global.canon/en/support/) — PIXMA, imageRUNNER.
-   - [Epson Setup](https://epson.com/Support/sl/s) — EcoTank, WorkForce.
+   - [Canon Global Support](https://global.canon/en/support/) — PIXMA, imageRUNNER, imageCLASS.
+   - [Epson Setup](https://epson.com/Support/sl/s) — EcoTank, WorkForce, Expression.
    - [Brother Solutions Center](https://support.brother.com/g/b/countrytop.aspx) — HL, MFC series.
-   - [Zebra Downloads](https://www.zebra.com/us/en/support-downloads/printers.html) — ZPL, thermal label software.
+   - [Zebra Downloads](https://www.zebra.com/us/en/support-downloads/printers.html) — ZPL drivers and setup utilities.
+
+---
+
+## 7. Thermal Label & Receipt Hardware Calibration Tips
+
+### Resolution Standards:
+- Standard desktop thermal printers operate at **203 DPI** (8 dots/mm) or **300 DPI** (12 dots/mm).
+- For barcode clarity, ensure Code-128 barcode modules align with integer dot pitches (avoid fractional dot scaling to prevent barcode scanner read errors).
+
+### Tear-Off Margin Compensation:
+- Most thermal label heads have a physical distance of 2mm to 4mm between the thermal burn line and the tear bar.
+- Use PrintVLC's **Top Margin** setting in Tab 1 to calibrate content so labels don't clip at the tear line.
+
+---
+
+## 8. Hardware Troubleshooting Matrix
+
+| Symptom | Cause | Solution |
+| :--- | :--- | :--- |
+| **WebUSB device list empty** | Device not in Printer Class or driver claimed by OS | Run via `START_PRINTVLC.bat` on `localhost:3000`. If on Windows, check Zadig WinUSB or use System Spooler mode. |
+| **Bluetooth pairing fails** | Printer not in discoverable mode | Power cycle printer and hold the pairing button until the LED blinks rapidly. |
+| **Network IP unreachable** | Printer on different subnet or blocked by firewall | Verify workstation and printer share the same subnet mask (e.g. `192.168.1.x`). Ensure port 631/9100 is unblocked. |
+| **Unwanted browser headers on paper** | Native browser print dialog settings | In the native print dialog, expand *More settings* and uncheck *Headers and footers*. |
+
+---
+
+*Authored by **[DaiviAeroBoy](https://github.com/DaiviAeroBoy)**. Open source under the MIT License.*

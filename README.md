@@ -5,12 +5,12 @@
 
 **100% In-Browser • Zero Driver Installation • Zero Server Uploads • Air-Gapped Privacy**
 
-[![Author: daiviaerooy](https://img.shields.io/badge/Author-daiviaerooy-orange.svg?logo=github)](https://github.com/daiviaerooy)
-[![Repository: daiviaerooy/PrintVLC](https://img.shields.io/badge/GitHub-daiviaerooy%2FPrintVLC-blue.svg?logo=github)](https://github.com/daiviaerooy/PrintVLC)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Privacy: Zero Telemetry](https://img.shields.io/badge/Privacy-100%25%20In--Browser-00e5ff.svg)](#privacy-guarantee)
-[![Hardware: WebUSB & Bluetooth](https://img.shields.io/badge/Hardware-WebUSB%20%7C%20Bluetooth%20%7C%20IPP-ff781f.svg)](#hardware-connectivity)
-[![AI Engine: WebGPU](https://img.shields.io/badge/AI%20Core-WebGPU%20%2F%20SmolLM2-10b981.svg)](#on-device-ai)
+[![Author: DaiviAeroBoy](https://img.shields.io/badge/Author-DaiviAeroBoy-orange.svg?logo=github)](https://github.com/DaiviAeroBoy)
+[![Repository: DaiviAeroBoy/PrintVLC](https://img.shields.io/badge/GitHub-DaiviAeroBoy%2FPrintVLC-blue.svg?logo=github)](https://github.com/DaiviAeroBoy/PrintVLC)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Privacy: Zero Telemetry](https://img.shields.io/badge/Privacy-100%25%20In--Browser-00e5ff.svg)](#-privacy--air-gapped-security)
+[![Hardware: WebUSB & Bluetooth](https://img.shields.io/badge/Hardware-WebUSB%20%7C%20Bluetooth%20%7C%20IPP-ff781f.svg)](#-hardware-connectivity--drivers)
+[![AI Engine: WebGPU](https://img.shields.io/badge/AI%20Core-WebGPU%20%2F%20SmolLM2-10b981.svg)](#-on-device-ai-assistant-webgpu)
 [![Framework: React 19 + Vite](https://img.shields.io/badge/Stack-React%2019%20%2B%20TypeScript-6366f1.svg)](https://react.dev)
 
 <br/>
@@ -24,60 +24,61 @@
 ---
 
 ## 📑 Table of Contents
-1. [Why PrintVLC?](#why-printvlc)
+1. [Why PrintVLC?](#-why-printvlc)
 2. [Documentation Hub](#-documentation-hub)
-3. [Quick Start (1-Click Run)](#quick-start-1-click-run)
-4. [How It Was Made (Engineering Architecture)](#how-it-was-made-engineering-architecture)
-5. [Universal Document Ingestion (Demuxers)](#universal-document-ingestion-demuxers)
-6. [The Master Pre-Flight Studio (8 Tabs)](#the-master-pre-flight-studio-8-tabs)
-7. [Hardware Connectivity & Drivers](#hardware-connectivity--drivers)
-8. [On-Device AI Assistant (WebGPU)](#on-device-ai-assistant-webgpu)
-9. [Privacy & Air-Gapped Security](#privacy--air-gapped-security)
-10. [License](#license)
+3. [Instant Run Options (Zero npm Required)](#-instant-run-options-zero-npm-required)
+4. [Developer Quick Start](#-developer-quick-start)
+5. [Engineering Architecture](#-engineering-architecture)
+6. [Universal Document Ingestion (Demuxers)](#-universal-document-ingestion-demuxers)
+7. [The Master Pre-Flight Studio (8 Tabs)](#-the-master-pre-flight-studio-8-tabs)
+8. [Hardware Connectivity & Driver Resolver](#-hardware-connectivity--drivers)
+9. [On-Device AI Assistant (WebGPU)](#-on-device-ai-assistant-webgpu)
+10. [Privacy & Air-Gapped Security](#-privacy--air-gapped-security)
+11. [License & Author](#-license--author)
 
 ---
 
 ## 📚 Documentation Hub
 
-Explore the detailed dedicated guides in the [`docs/`](docs/) directory:
+Explore our detailed, dedicated documentation in the [`docs/`](docs/) directory:
 
-| Document | Description | Direct Link |
+| Document | Focus Area | Direct Link |
 | :--- | :--- | :--- |
-| 📖 **Technical Architecture** | Demuxing pipeline, Saddle-stitch & GSM creep math, WebGPU shaders, memory lifecycle | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
-| 🔌 **Hardware Connection & Drivers** | WebUSB setup, Web Bluetooth SPP pairing, IPP:631 & Raw:9100, OEM driver resolver | [docs/HARDWARE_SETUP.md](docs/HARDWARE_SETUP.md) |
-| 🧑‍💻 **Step-by-Step User Guide** | Pro booklets, poster slicing, True Redaction, CSV variable data merge, duplex wizard | [docs/USER_GUIDE.md](docs/USER_GUIDE.md) |
+| 📖 **Technical Architecture** | Demuxing pipeline, Saddle-stitch math, GSM creep compensation, WebGPU shaders, memory lifecycle | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
+| 🔌 **Hardware Connection & Drivers** | WebUSB setup, Web Bluetooth SPP pairing, IPP:631 & Raw:9100 socket, OEM driver resolver | [docs/HARDWARE_SETUP.md](docs/HARDWARE_SETUP.md) |
+| 🧑‍💻 **Step-by-Step User Guide** | Pro booklets, poster slicing, True Redaction, CSV variable data merge, manual duplex wizard | [docs/USER_GUIDE.md](docs/USER_GUIDE.md) |
 
 ---
 
 ## 🌟 Why PrintVLC?
 
-Every modern printer OS dialogue is crippled by:
-- Incompatible proprietary drivers and manufacturer bloatware.
-- Cloud telemetry services uploading private documents to corporate servers.
-- Broken mobile scans with shadows, hole-punch marks, and skewed orientations.
-- Complicated imposition mathematics (booklets, N-up grids, poster tiling).
-- Wasted ink and expensive color toner contamination on laser printers.
+Every modern printer OS dialogue and commercial print workflow suffers from the same issues:
+- **Proprietary Bloatware & Missing Drivers:** Needing multi-gigabyte manufacturer driver suites just to send text or barcodes.
+- **Cloud Telemetry & Privacy Leaks:** Online "free PDF converters" and vendor clouds uploading sensitive contracts, patient records, and tax forms to third-party servers.
+- **Flawed Scans & Distortions:** Uneven mobile camera lighting, tilted receipts, dark scanner bed borders, and hole-punch / staple holes ruining prints.
+- **Imposition Complexity:** Trying to calculate saddle-stitch booklet signatures, N-up grids, or multi-sheet wall posters manually in Word or Acrobat.
+- **Color Toner Contamination & Cost:** Black text accidentally printed with composite CMY color toner, multiplying printing costs 5×–10×.
 
-**PrintVLC solves all of this inside client-side RAM.** Whether you have a $50 Bluetooth receipt printer, an industrial Zebra ZPL thermal label head, an office laser multi-function printer, or a high-end wide-format plotter, PrintVLC communicates directly via WebUSB, Web Bluetooth, Local IPP (port 631), Raw JetDirect (port 9100), or the zero-bleed `@media print` system spooler.
+**PrintVLC solves all of these problems inside client-side RAM.** Whether you have a $50 Bluetooth receipt printer, an industrial Zebra ZPL thermal label head, an office laser multi-function printer, or a high-end wide-format plotter, PrintVLC communicates directly via **WebUSB**, **Web Bluetooth**, **Local IPP (port 631)**, **Raw JetDirect (port 9100)**, or the zero-bleed **`@media print`** system spooler.
 
 ---
 
-## 🚀 How to Use PrintVLC (No Terminal / No npm Required)
+## 🚀 Instant Run Options (Zero npm Required)
 
 You have **3 instant ways** to run PrintVLC depending on your preference:
 
 ### 📄 Option 1: 1-Click Single-File Executable (`PrintVLC.html`)
-The entire application (codecs, UI, studio, filters) has been bundled into a **single, standalone HTML file**:
-1. Simply double-click [`PrintVLC.html`](PrintVLC.html) in your browser.
+The entire application (codecs, UI, studio, prepress filters, icons) is bundled into a **single, standalone HTML file**:
+1. Simply double-click [`PrintVLC.html`](PrintVLC.html) in your browser (Chrome, Edge, Firefox, Safari, Brave, Opera).
 2. **Zero installation. Zero servers. Zero terminal commands.**
-3. Works completely offline on Windows, macOS, Linux, and Android. You can even copy it to a USB flash drive!
+3. Works completely offline on Windows, macOS, Linux, and Android. You can carry it on a USB flash drive or air-gapped laptop!
 
 ---
 
 ### 🖱️ Option 2: 1-Click Windows Launcher (`START_PRINTVLC.bat`)
 For full physical hardware support (WebUSB and Web Bluetooth require a local secure origin):
 1. Double-click [`START_PRINTVLC.bat`](START_PRINTVLC.bat) in the project folder.
-2. It automatically boots the local sandboxed server and opens **`http://localhost:3000`** in your browser.
+2. It automatically checks runtime dependencies, boots the local sandboxed server, and opens **`http://localhost:3000`** in your default browser.
 
 ---
 
@@ -91,7 +92,7 @@ If you are visiting this repository on GitHub:
 
 ---
 
-## 👨‍💻 Developer Guide (For Developing & Modifying Source Code)
+## 👨‍💻 Developer Quick Start
 
 If you are a developer looking to contribute, modify components, or extend demuxers:
 
@@ -102,7 +103,7 @@ If you are a developer looking to contribute, modify components, or extend demux
 ### Developer Commands:
 ```bash
 # 1. Clone the repository
-git clone https://github.com/daiviaerooy/PrintVLC.git
+git clone https://github.com/DaiviAeroBoy/PrintVLC.git
 cd PrintVLC
 
 # 2. Install dependencies
@@ -116,37 +117,41 @@ npm run build
 
 # 5. Re-generate the 100% self-contained single-file HTML (PrintVLC.html)
 npm run build:single
+
+# 6. Run fast linter
+npm run lint
 ```
 
 ### Extending the Codebase:
 - **Adding new document demuxers**: Add parser logic in [`src/utils/documentHopper.ts`](src/utils/documentHopper.ts).
 - **Adding hardware printer protocols**: Extend [`src/utils/hardwareConnector.ts`](src/utils/hardwareConnector.ts).
 - **Customizing Prepress & Canvas Filters**: Modify [`src/utils/imageFilters.ts`](src/utils/imageFilters.ts) and [`src/utils/inkIntelligence.ts`](src/utils/inkIntelligence.ts).
+- **Stationery & Patterns**: Add math templates in [`src/utils/stationeryGenerator.ts`](src/utils/stationeryGenerator.ts).
 
 ---
 
-## 🛠️ How It Was Made (Engineering Architecture)
+## 🛠️ Engineering Architecture
 
-PrintVLC is built from the ground up to guarantee **zero network egress** while matching the raw performance of native desktop desktop publishing (DTP) software.
+PrintVLC is engineered from the ground up to guarantee **zero network egress** while matching the raw performance of native desktop desktop publishing (DTP) software.
 
 > 📖 **Deep Dive:** For full mathematical formulas (saddle-stitch signatures, GSM creep shingling), memory isolation lifecycle, and demuxing mechanics, read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ```
-PrintVLC Architecture
+PrintVLC Architecture Pipeline
 │
-├── Ingestion Layer ───────► Client-side Workers & WASM Demuxers
+├── 1. Ingestion Layer ─────► Client-side Workers & WASM Demuxers
 │                            (PDF.js, docx-preview, SheetJS, UTIF.js, ag-psd, dxf-parser)
 │
-├── Studio Core Engine ────► High-DPI 2D Canvas & WebGL Matrix Pipeline
+├── 2. Studio Core Engine ──► High-DPI 2D Canvas & WebGL Matrix Pipeline
 │                            (Physical Rulers, Bleed Guides, Non-printable Bounds)
 │
-├── Transformation Matrix ─► Imposition, Geometry & Prepress Filters
-│                            (Booklet Creep GSM, Pure K-Lock, Hole-Punch Eraser)
+├── 3. Transformation ─────► Imposition, Geometry & Prepress Filters
+│                            (Booklet Creep GSM, Pure K-Lock, Hole-Punch Inpainting)
 │
-├── On-Device AI ──────────► WebGPU Shader Pipeline
+├── 4. On-Device AI ────────► WebGPU Shader Pipeline
 │                            (SmolLM2-135M, PII Detector, Real-ESRGAN Super-Res)
 │
-└── Hardware Dispatch ─────► Direct I/O Endpoints
+└── 5. Hardware Dispatch ───► Direct I/O Endpoints
                              (WebUSB API, Web Bluetooth SPP, IPP:631, Raw:9100, PDF-Lib)
 ```
 
@@ -156,12 +161,13 @@ PrintVLC Architecture
 - **Document & Vector Engines**:
   - `pdfjs-dist`: High-resolution client-side PDF rasterization.
   - `pdf-lib`: PDF/X-1a flattened master output generation.
-  - `docx-preview`: Client-side Microsoft Word rendering.
+  - `docx-preview`: Client-side Microsoft Word rendering in detached virtual DOM.
   - `xlsx` (SheetJS): Spreadsheet workbook and CSV table parsing.
-  - `utif`: Multi-page medical/archival TIFF decode.
+  - `utif`: Multi-page medical and archival TIFF decode.
   - `ag-psd`: Layered Adobe Photoshop PSD parser.
   - `dxf-parser`: 2D CAD engineering blueprint vector rendering.
-- **Hardware Protocols**: WebUSB API (`navigator.usb`), Web Bluetooth API (`navigator.bluetooth`), Fetch/Socket local network endpoints.
+  - `prismjs`: Syntax-highlighted paginated code printouts.
+- **Hardware Protocols**: WebUSB API (`navigator.usb`), Web Bluetooth API (`navigator.bluetooth`), Local HTTP/Socket endpoints.
 - **Storage**: Browser `IndexedDB` (via `idb`) + `CacheStorage` (Zero remote DBs).
 
 ---
@@ -170,14 +176,14 @@ PrintVLC Architecture
 
 The **Universal Document Hopper** automatically normalizes and stitches multi-format file drops into a unified paginated print queue:
 
-| Category | Supported Formats | Engine / Decoder |
-| :--- | :--- | :--- |
-| **Office & Documents** | PDF, DOCX, XLSX, XLS, CSV, ODS, TXT, RTF | `pdfjs-dist`, `docx-preview`, `xlsx` |
-| **Raster & Photos** | PNG, JPG, JPEG, WEBP, GIF, BMP, AVIF | Native Canvas API / ImageBitmap |
-| **Specialized & Scans**| TIFF, TIF, PSD, HEIC | `utif`, `ag-psd`, `libheif-js` fallback |
-| **CAD & Vector** | 2D DXF, SVG | `dxf-parser`, Native SVG DOM Engine |
-| **Hardware Code** | Zebra ZPL (`^XA...^XZ`), ESC/POS Receipts | In-browser canvas emulator |
-| **Code & Markdown** | `.md`, `.js`, `.ts`, `.py`, `.html`, `.css`, etc. | Prism syntax highlighting & auto-pagination |
+| Category | Supported Formats | Engine / Decoder | Output Mode |
+| :--- | :--- | :--- | :--- |
+| **Office & Documents** | PDF, DOCX, XLSX, XLS, CSV, ODS, TXT, RTF | `pdfjs-dist`, `docx-preview`, `xlsx` | Multi-page High-DPI Canvas |
+| **Raster & Photos** | PNG, JPG, JPEG, WEBP, GIF, BMP, AVIF | Native Canvas API / ImageBitmap | Scaled Raster Canvas |
+| **Specialized & Scans**| TIFF, TIF, PSD, HEIC | `utif`, `ag-psd`, `libheif-js` fallback | Multi-page / Layered Canvas |
+| **CAD & Vector** | 2D DXF, SVG | `dxf-parser`, Native SVG DOM Engine | Crisp Blueprint Vectors |
+| **Hardware Code** | Zebra ZPL (`^XA...^XZ`), ESC/POS Receipts | In-browser canvas emulator | Calibrated Label / Receipt Canvas |
+| **Code & Markdown** | `.md`, `.js`, `.ts`, `.py`, `.html`, `.css`, etc. | Prism syntax highlighting & auto-pagination | Formatted Monospace Code Sheets |
 
 *Drop 1 DOCX + 4 JPGs + 1 PDF together — PrintVLC stitches them seamlessly into one continuous print queue.*
 
@@ -188,11 +194,11 @@ The **Universal Document Hopper** automatically normalizes and stitches multi-fo
 > 🧑‍💻 **User Manual:** For step-by-step instructions on making saddle-stitch booklets, slicing wall posters, applying True Redaction, and variable data merging, read [docs/USER_GUIDE.md](docs/USER_GUIDE.md).
 
 ### Center Workspace:
-- Real-time physical **millimeter and inch rulers** overlay.
+- Real-time physical **millimeter and inch rulers** overlay with live cursor tracking.
 - Red dashed non-printable hardware margin boundary lines.
 - Live interactive mouse-drag tool for **permanent black-box redaction**.
 - High-speed bottom thumbnail scrubber to slide across multi-hundred-page queues.
-- Left filmstrip with drag-and-drop page reordering, per-page 90° rotation, duplicate, and delete.
+- Left filmstrip with drag-and-drop page reordering, per-page 90° rotation, duplicate, add blank page, and delete.
 
 ### 8 Studio Configuration Tabs:
 
@@ -201,18 +207,19 @@ The **Universal Document Hopper** automatically normalizes and stitches multi-fo
 - Custom roll dimensions in exact millimeters.
 - Portrait / Landscape orientation toggle.
 - 4-way independent margin inputs with link/unlink padlock toggle.
-- Margin presets: Zero/Borderless, Standard Office (20mm), Minimal (6mm), Book Binding Gutter (25mm).
-- Framed border generator (solid, dashed, double frames with custom thickness).
+- Margin presets: Zero/Borderless, Standard Office (15mm), Minimal (6mm), Book Binding Gutter (25mm).
+- Framed border generator (solid, dashed, double frames with custom thickness and color picker).
 
 #### TAB 2: Scaling & Placement
 - Fit to Printable Area (margin-aware).
 - Fill Entire Sheet (full-bleed crop).
 - Custom Percentage Scale Slider (1% to 500%).
-- Exact Physical Millimeter Lock.
+- Exact Physical Millimeter Lock (type exact target width and height in mm).
+- Center Horizontally & Vertically shortcuts.
 - Magnetic 5mm grid snap and margin boundary snap aids.
 
 #### TAB 3: Imposition & Multi-Page Layouts
-- **N-Up Grid**: 1, 2, 4, 6, 8, 9, 16 pages per sheet with configurable cell gaps and optional scissor cut-lines.
+- **N-Up Grid**: 1, 2, 4, 6, 8, 9, 16 pages per sheet with configurable cell gaps (mm) and optional scissor cut-lines.
 - **Pro Booklet Maker**: Saddle-stitch signature calculation, auto-pads blank pages to multiples of 4, spine gutter margin, GSM-based Creep Compensation (shingling), and fold/staple tick marks.
 - **Poster / Tiling Slicer**: Splits a single image across a 2×2 up to 10×10 sheet grid with overlap glue tabs (in mm), cut crosshairs (`+`), and coordinate stamps (`R1-C1`).
 - **ID Photo Multiplier**: Clones 1 headshot into 6, 8, or 12 calibrated ID cuts on a 4×6" photo paper template.
@@ -220,7 +227,7 @@ The **Universal Document Hopper** automatically normalizes and stitches multi-fo
 #### TAB 4: Deskew & Geometry Restoration
 - **In-Browser Auto-Deskew**: Gradient baseline edge sampler levels slanted scans automatically.
 - **Manual Angle Dial**: Slider from -45° to +45° with 0.1° precision.
-- **4-Point Perspective Warp**: Keystone correction pins flatten angled camera shots.
+- **4-Point Perspective Warp**: Keystone correction pins flatten angled mobile camera shots.
 - **Scanner Bed Auto-Crop**: Trims dark lid borders, shadow edges, and excess glass.
 
 #### TAB 5: Document Cleanup & Restoration
@@ -237,11 +244,11 @@ The **Universal Document Hopper** automatically normalizes and stitches multi-fo
 
 #### TAB 7: Ink Intelligence & Prepress Tools
 - **Pure K-Channel Black Lock**: Forces off-black (`#1A1A1A`) and dark RGB text to pure 100% K black, preventing color toner contamination on laser printers.
-- **Eco Toner Saver**: Reduces halftone density by ~25% while preserving sharp glyph edges.
+- **Eco Toner Saver**: Reduces halftone density by ~20%–25% while preserving sharp glyph edges.
 - **Dark Mode Neutralizer**: Inverts dark websites or code backgrounds to crisp white and light text to dark.
 - **CMYK Soft Proofing**: Simulates ink absorption on matte, glossy, and uncoated paper stocks.
 - **Real-Time CMYK Coverage & Cost**: Calculates CMYK pixel percentage and live cost per sheet.
-- **Orphan Page Squisher**: Scales margins down by 2%–4% to pull trailing 2-line pages into the previous sheet.
+- **Orphan Page Squisher**: Scales margins down by 2%–4% and scale by 3% to pull trailing 2-line overflow pages into the previous sheet.
 - **Diagnostic Targets**: Generates CMYK printhead purge bars and duplex registration grids.
 - **Manual Duplex Wizard**: Interactive 3D paper flip guide for odd/even batch passes on single-sided printers.
 
@@ -288,7 +295,7 @@ PrintVLC integrates an on-device neural core powered by WebGPU shaders:
 - **Tier 1 (Semantic Text Engine)**: SmolLM2-135M (Q4 Quantized)
   - **1-Page Executive Cheatsheet**: Condenses multi-page documents into a structured single-page briefing.
   - **Automated PII Redaction**: Scans and blacklists Social Security Numbers, Credit Cards, Emails, and Phone Numbers, converting them to True Redaction boxes with one click.
-- **Tier 2 (Vision & Scan Enhancer)**: PP-OCRv4 + Real-ESRGAN
+- **Tier 2 (Vision & Scan Enhancer)**: Compact Real-ESRGAN + Scan Lighting Normalizer
   - Levels uneven mobile camera lighting gradients.
   - Sharpens text strokes and upscales low-resolution scans 2x/4x without pixelation.
 - **Local Weight Caching**: Models are optionally cached in browser `CacheStorage` for offline use and can be purged instantly.
@@ -307,16 +314,7 @@ PrintVLC is engineered for healthcare, legal, financial, and government environm
 
 ---
 
-## 📚 Related Documentation
-
-For in-depth architectural diagrams, hardware guides, and user manuals, explore the `docs/` folder:
-- 📖 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — Technical demuxing pipeline, imposition formulas, and memory lifecycle.
-- 🔌 [docs/HARDWARE_SETUP.md](docs/HARDWARE_SETUP.md) — WebUSB, Web Bluetooth, and LAN IPP connection manual.
-- 🧑‍💻 [docs/USER_GUIDE.md](docs/USER_GUIDE.md) — Step-by-step walkthrough for Booklets, Posters, Redactions, and Variable Merge.
-
----
-
 ## 📜 License & Author
 
-PrintVLC is created and maintained by **[daiviaerooy](https://github.com/daiviaerooy)**.  
+PrintVLC is created and maintained with pride by **[DaiviAeroBoy](https://github.com/DaiviAeroBoy)**.  
 Released as free and open-source software under the **[MIT License](LICENSE)**.
