@@ -1,4 +1,5 @@
 export type AIModelTier = 'tier1_text' | 'tier2_vision';
+export type AIModelDownloadStatus = 'uninstalled' | 'downloading' | 'ready';
 
 export interface WebGPUStatus {
   isSupported: boolean;

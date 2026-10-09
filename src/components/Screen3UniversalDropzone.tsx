@@ -20,12 +20,16 @@ interface Screen3UniversalDropzoneProps {
   onPagesIngested: (pages: PageItem[]) => void;
   isLoading: boolean;
   setIsLoading: (val: boolean) => void;
+  totalPages?: number;
+  onNavigateToStudio?: () => void;
 }
 
 export const Screen3UniversalDropzone: React.FC<Screen3UniversalDropzoneProps> = ({
   onPagesIngested,
   isLoading,
-  setIsLoading
+  setIsLoading,
+  totalPages = 0,
+  onNavigateToStudio
 }) => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string>('');
@@ -147,6 +151,31 @@ export class PrintQueueManager {
         multiple
         className="hidden"
       />
+
+      {/* Queue Status Banner if documents are loaded */}
+      {totalPages > 0 && onNavigateToStudio && (
+        <div className="flex flex-col sm:flex-row items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-[#1c1c28] via-[#222230] to-[#1c1c28] border border-[#ff781f]/40 shadow-xl shadow-black/40 gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-[#ff781f]/15 text-[#ff781f] border border-[#ff781f]/30">
+              <Layers className="h-5 w-5" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-white">Active Print Queue Loaded</h4>
+              <p className="text-xs text-gray-300">
+                You currently have <span className="text-[#ff781f] font-mono font-bold">{totalPages} page{totalPages > 1 ? 's' : ''}</span> in your studio queue ready for preflighting and printing.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onNavigateToStudio}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#ff781f] hover:bg-[#ff8e3d] text-black font-bold text-xs font-mono uppercase tracking-wider transition-all shadow-md shadow-[#ff781f]/20 shrink-0"
+          >
+            <span>Go to Studio Editor</span>
+            <ArrowRight className="h-4 w-4 stroke-[2.5]" />
+          </button>
+        </div>
+      )}
 
       {/* Main Drag-and-Drop Ingestion Zone */}
       <div

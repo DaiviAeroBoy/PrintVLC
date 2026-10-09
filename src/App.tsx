@@ -16,12 +16,17 @@ import {
   VariableDataMergeSettings, 
   WatermarkSettings 
 } from './types/studio';
-import { STANDARD_PAPER_SIZES } from './constants/paperSizes';
 import { StorageMode, storageService } from './utils/storage';
 import { streamToSystemSpooler } from './utils/hardwareConnector';
 import { exportToPrintReadyPdf } from './utils/pdfExport';
 import { generateStationeryPage } from './utils/stationeryGenerator';
 import { estimateDeskewAngle } from './utils/imageFilters';
+import { popOutAndPrintDocument } from './utils/printPopout';
+import { 
+  renderAllStudioPages, 
+  renderStudioPageToCanvas, 
+  StudioRenderOptions 
+} from './utils/studioRenderer';
 
 import { Screen1ConsentModal } from './components/Screen1ConsentModal';
 import { Screen2HardwareHub } from './components/Screen2HardwareHub';
@@ -33,6 +38,7 @@ import { StudioScrubber } from './components/Screen4Studio/StudioScrubber';
 import { StudioInspector } from './components/Screen4Studio/StudioInspector';
 import { DuplexWizardModal } from './components/Screen4Studio/DuplexWizardModal';
 import { Screen5AIAssistantModal } from './components/Screen5AIAssistantModal';
+import { PrintOptionsModal } from './components/Screen4Studio/PrintOptionsModal';
 
 export function App() {
   // Navigation & Screen States
@@ -40,6 +46,8 @@ export function App() {
   const [currentScreen, setCurrentScreen] = useState<'studio' | 'hardware' | 'dropzone'>('dropzone');
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   const [isDuplexWizardOpen, setIsDuplexWizardOpen] = useState(false);
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+  const [isPopupBlocked, setIsPopupBlocked] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
@@ -177,6 +185,22 @@ export function App() {
   const [isPreviewMode, setIsPreviewMode] = useState<boolean>(false);
   const renderedCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
+  // Current studio options object for high-res render pipeline
+  const studioRenderOptions: StudioRenderOptions = {
+    paperWidthMm,
+    paperHeightMm,
+    margins,
+    scaleMode,
+    scalePercent,
+    borderSettings,
+    deskew,
+    cleanup,
+    watermark,
+    headerFooter,
+    inkIntel,
+    redactions
+  };
+
   // Check consent on startup
   useEffect(() => {
     const consent = storageService.getConsent();
@@ -185,9 +209,32 @@ export function App() {
     }
   }, []);
 
+  // Intercept Ctrl+P to trigger clean pop-out print modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {
+        e.preventDefault();
+        if (pages.length > 0) {
+          setIsPrintModalOpen(true);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [pages.length]);
+
   const handleConsentConfirm = (mode: StorageMode) => {
     storageService.setConsent(mode);
     setHasConsented(true);
+  };
+
+  // Navigation handler
+  const handleNavigate = (screen: 'studio' | 'hardware' | 'dropzone') => {
+    if (screen === 'studio' && pages.length === 0) {
+      setCurrentScreen('dropzone');
+      return;
+    }
+    setCurrentScreen(screen);
   };
 
   // Ingestion handler from Dropzone
@@ -271,15 +318,23 @@ export function App() {
 
   // Export to Print-Ready Master PDF
   const handleExportPdf = async () => {
-    if (!renderedCanvasRef.current) return;
+    if (pages.length === 0) return;
     setIsExporting(true);
     try {
+      let canvasesToExport: HTMLCanvasElement[] = [];
+      if (pages.length === 1 && renderedCanvasRef.current) {
+        canvasesToExport = [renderedCanvasRef.current];
+      } else {
+        canvasesToExport = await renderAllStudioPages(pages, studioRenderOptions, 150);
+      }
+
       await exportToPrintReadyPdf(
-        [renderedCanvasRef.current],
+        canvasesToExport,
         paperWidthMm,
         paperHeightMm,
         `PrintVLC_${pages[activePageIndex]?.sourceFileName || 'Master'}.pdf`
       );
+      setIsPrintModalOpen(false);
     } catch (e: any) {
       alert(`PDF Export Error: ${e.message}`);
     } finally {
@@ -287,18 +342,83 @@ export function App() {
     }
   };
 
-  // Print execution: Streams to System Spooler
-  const handlePrint = () => {
-    if (!renderedCanvasRef.current) return;
+  // Execute Print with Pop-Out Window Engine
+  const handleExecutePrint = async (scope: 'all' | 'current', popout: boolean) => {
+    if (pages.length === 0) return;
     setIsPrinting(true);
+    setIsPopupBlocked(false);
 
     try {
-      streamToSystemSpooler([renderedCanvasRef.current]);
-      confetti({
-        particleCount: 80,
-        spread: 60,
-        origin: { y: 0.85 }
-      });
+      let canvasesToPrint: HTMLCanvasElement[] = [];
+
+      if (scope === 'current') {
+        if (renderedCanvasRef.current) {
+          canvasesToPrint = [renderedCanvasRef.current];
+        } else {
+          const res = await renderStudioPageToCanvas(
+            pages[activePageIndex],
+            activePageIndex,
+            pages.length,
+            studioRenderOptions,
+            150
+          );
+          canvasesToPrint = [res.canvas];
+        }
+      } else {
+        // Render all pages in queue
+        canvasesToPrint = await renderAllStudioPages(
+          pages,
+          studioRenderOptions,
+          150
+        );
+      }
+
+      const docName = pages[activePageIndex]?.sourceFileName || 'PrintVLC Document';
+
+      if (popout) {
+        const result = popOutAndPrintDocument({
+          canvases: canvasesToPrint,
+          documentName: docName,
+          paperWidthMm,
+          paperHeightMm,
+          isLandscape,
+          autoPrint: true
+        });
+
+        if (result.blocked) {
+          setIsPopupBlocked(true);
+          // Fallback to in-page spooler if popup is blocked
+          streamToSystemSpooler(canvasesToPrint, {
+            documentName: docName,
+            paperWidthMm,
+            paperHeightMm,
+            isLandscape
+          });
+        } else {
+          setIsPrintModalOpen(false);
+          confetti({
+            particleCount: 80,
+            spread: 60,
+            origin: { y: 0.85 }
+          });
+        }
+      } else {
+        // Direct spooler stream
+        streamToSystemSpooler(canvasesToPrint, {
+          documentName: docName,
+          paperWidthMm,
+          paperHeightMm,
+          isLandscape
+        });
+        setIsPrintModalOpen(false);
+        confetti({
+          particleCount: 80,
+          spread: 60,
+          origin: { y: 0.85 }
+        });
+      }
+    } catch (err: any) {
+      alert(`Print Error: ${err.message}`);
     } finally {
       setIsPrinting(false);
     }
@@ -307,7 +427,7 @@ export function App() {
   const activePage = pages[activePageIndex];
 
   return (
-    <div className="min-h-screen bg-[#121214] text-[#f3f4f6] flex flex-col antialiased selection:bg-[#ff781f] selection:text-white">
+    <div className="min-h-screen bg-[#111216] text-[#f3f4f6] flex flex-col antialiased selection:bg-[#ff781f] selection:text-white">
       
       {/* SCREEN 1: Privacy & Storage Consent Modal */}
       <Screen1ConsentModal
@@ -319,12 +439,13 @@ export function App() {
       <StudioHeader
         documentName={activePage?.sourceFileName || 'Universal Print Queue'}
         totalPages={pages.length}
+        activePageIndex={activePageIndex}
         connectionType={connectionType}
-        onOpenHardwareHub={() => setCurrentScreen('hardware')}
-        onOpenDropzone={() => setCurrentScreen('dropzone')}
+        currentScreen={currentScreen}
+        onNavigate={handleNavigate}
         onOpenAIModal={() => setIsAIModalOpen(true)}
         onExportPdf={handleExportPdf}
-        onPrint={handlePrint}
+        onOpenPrintModal={() => setIsPrintModalOpen(true)}
         isExporting={isExporting}
         isPrinting={isPrinting}
       />
@@ -356,6 +477,8 @@ export function App() {
               onPagesIngested={handlePagesIngested}
               isLoading={isLoading}
               setIsLoading={setIsLoading}
+              totalPages={pages.length}
+              onNavigateToStudio={() => setCurrentScreen('studio')}
             />
           </div>
         )}
@@ -520,6 +643,27 @@ export function App() {
         onPrintEvenPages={() => {
           alert('Printing Even Pages Batch in reverse order to back of stack.');
         }}
+      />
+
+      {/* Print Options & Pop-Out Modal */}
+      <PrintOptionsModal
+        isOpen={isPrintModalOpen}
+        onClose={() => {
+          setIsPrintModalOpen(false);
+          setIsPopupBlocked(false);
+        }}
+        documentName={activePage?.sourceFileName || 'PrintVLC Document'}
+        totalPages={pages.length}
+        activePageIndex={activePageIndex}
+        paperWidthMm={paperWidthMm}
+        paperHeightMm={paperHeightMm}
+        isLandscape={isLandscape}
+        onConfirmPrint={handleExecutePrint}
+        onExportPdf={handleExportPdf}
+        isPrinting={isPrinting}
+        isExporting={isExporting}
+        popupBlocked={isPopupBlocked}
+        onRetryBlockedPopup={() => handleExecutePrint('all', true)}
       />
 
     </div>

@@ -109,35 +109,60 @@ export async function testNetworkPrinter(config: NetworkPrinterConfig): Promise<
   }
 }
 
+import { popOutAndPrintDocument } from './printPopout';
+
 /**
- * Stream Processed High-DPI Canvases to System Print Spooler (@media print)
+ * Stream Processed High-DPI Canvases to Dedicated Pop-out Print Window or System Spooler
  */
-export function streamToSystemSpooler(canvases: HTMLCanvasElement[]): void {
-  const mountPoint = document.getElementById('print-mount-point');
-  if (!mountPoint) {
-    window.print();
-    return;
+export function streamToSystemSpooler(
+  canvases: HTMLCanvasElement[],
+  options?: {
+    documentName?: string;
+    paperWidthMm?: number;
+    paperHeightMm?: number;
+    isLandscape?: boolean;
+    forcePopout?: boolean;
   }
-
-  // Clear previous print stream
-  mountPoint.innerHTML = '';
-
-  canvases.forEach((canvas, idx) => {
-    const img = document.createElement('img');
-    img.src = canvas.toDataURL('image/png', 1.0);
-    img.className = 'print-page-break';
-    img.style.width = '100vw';
-    img.style.height = '100vh';
-    img.style.objectFit = 'contain';
-    img.style.display = 'block';
-    if (idx < canvases.length - 1) {
-      img.style.pageBreakAfter = 'always';
-    }
-    mountPoint.appendChild(img);
+): void {
+  // 1. Primary mechanism: Pop out clean document into dedicated window and trigger print
+  const result = popOutAndPrintDocument({
+    canvases,
+    documentName: options?.documentName || 'PrintVLC Document',
+    paperWidthMm: options?.paperWidthMm || 210,
+    paperHeightMm: options?.paperHeightMm || 297,
+    isLandscape: options?.isLandscape || false,
+    autoPrint: true
   });
 
-  // Small delay to ensure browser renders images into DOM before spooling
-  setTimeout(() => {
-    window.print();
-  }, 150);
+  // 2. If popup was blocked by browser security settings, fallback to hidden print mount point
+  if (result.blocked) {
+    const mountPoint = document.getElementById('print-mount-point');
+    if (!mountPoint) {
+      window.print();
+      return;
+    }
+
+    // Clear previous print stream
+    mountPoint.innerHTML = '';
+
+    canvases.forEach((canvas, idx) => {
+      const img = document.createElement('img');
+      img.src = canvas.toDataURL('image/png', 1.0);
+      img.className = 'print-page-break';
+      img.style.width = '100vw';
+      img.style.height = '100vh';
+      img.style.objectFit = 'contain';
+      img.style.display = 'block';
+      if (idx < canvases.length - 1) {
+        img.style.pageBreakAfter = 'always';
+      }
+      mountPoint.appendChild(img);
+    });
+
+    // Small delay to ensure browser renders images into DOM before spooling
+    setTimeout(() => {
+      window.print();
+    }, 150);
+  }
 }
+

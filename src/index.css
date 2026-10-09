@@ -50,6 +50,10 @@
     size: auto;
   }
 
+  #root {
+    display: none !important;
+  }
+
   body {
     background: #ffffff !important;
     color: #000000 !important;

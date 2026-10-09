@@ -13,6 +13,7 @@ export default defineConfig({
     open: false
   },
   optimizeDeps: {
+    entries: ['index.html'],
     include: ['pdf-lib', 'xlsx', 'idb', 'lucide-react', 'canvas-confetti', 'ag-psd', 'prismjs']
   }
 })
